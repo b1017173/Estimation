@@ -6,6 +6,8 @@
 """
 import random
 import time
+import numpy as np
+import matplotlib.pyplot as plt
 from abc import ABCMeta, abstractmethod
 
 class Individual():
@@ -121,6 +123,23 @@ class GaSolver(metaclass = ABCMeta):
         elites = sort_result[:num]
         return elites
 
+    def _extract_roulette(self, population, num):
+        """選択関数.
+
+        Parameters
+        ----------
+        population : list of Individual
+            集団.
+        num : int
+            個体選択数.
+
+        Returns
+        -------
+        elites : list of Individual
+            選択処理をした集団.
+        """
+        # その遺伝子の評価値/全評価値の合計値　が選択確率
+
     def _crossover(self, individual1, individual2, chromosome_length):
         """交叉関数.
         二点交叉を行います.
@@ -209,10 +228,11 @@ class GaSolver(metaclass = ABCMeta):
         next_generation_population = sorted(population, reverse=False, key=lambda individual: individual.evaluation)
 
         # 追加するエリート集団と子孫集団の合計ぶんを取り除く
-        next_generation_population = next_generation_population[len(elites)+len(offsprings):]
+        next_generation_population = next_generation_population[len(offsprings):]
+        # next_generation_population = next_generation_population[len(elites)+len(offsprings):]
 
         # エリート集団と子孫集団を次世代集団を次世代へ追加します
-        next_generation_population.extend(elites)
+        # next_generation_population.extend(elites)
         next_generation_population.extend(offsprings)
         return next_generation_population
 
@@ -332,5 +352,8 @@ class GaSolver(metaclass = ABCMeta):
         if self.verbose:
             print("")  # 改行
             print("最も優れた個体は{}".format(elites[0].chromosome))
+            plt.plot(np.arange(0, self.iteration, 1), self.history['Max'])
+            plt.plot(np.arange(0, self.iteration, 1), self.history['Avg'])
+            plt.show()
 
         return self.history
